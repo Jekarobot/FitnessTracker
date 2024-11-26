@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
+import { FaPencilAlt, FaTimes } from 'react-icons/fa';
 
 const FitnessTrackerForm: React.FC = () => {
   const [formData, setFormData] = useState({ date: '', steps: 0 });
   const [days, setDays] = useState<{ date: string; steps: number }[]>([]);
 
   const handleAddDay = () => {
+    if (formData.date.trim() === '') {
+        alert('Пожалуйста, введите дату.');
+        return; // Прекращаем выполнение функции если дата не введена
+      }
+      
     if (days.some((day) => day.date === formData.date)) {
         setDays(days.map((day) => day.date === formData.date ? { ...day, steps: day.steps + formData.steps } : day));
     } else {
@@ -31,16 +37,28 @@ const FitnessTrackerForm: React.FC = () => {
   return (
     <div className='tracker'>
     <div className='menu'>
-      <input className='date' type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
-      <input className='steps' type="number" value={formData.steps} onChange={(e) => setFormData({ ...formData, steps: parseInt(e.target.value) || 0 })} />
+    <div className='dateContainer'>
+      <p>Введите дату</p>
+      <input className='date' type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })}/>
+    </div>
+    <div className='stepsContainer'>
+      <p>Введите количество шагов</p>
+      <input className='steps' type="number" value={formData.steps} onChange={(e) => setFormData({ ...formData, steps: parseInt(e.target.value)})} />
+    </div>
       <button className='add-day' onClick={handleAddDay}>Добавить день</button>
     </div>
       <ul className='days'>
+        <div className='title'>
+          <p>Дата - Количество шагов</p>
+          <p>Действия</p>
+        </div>
         {sortDaysByDate(days).slice(-5).map((day, index) => (
           <li className='day' key={index}>
             {day.date} - {day.steps} steps
-            <button onClick={() => handleEditDay(index)}>Редактировать</button>
-            <button onClick={() => handleDeleteDay(index)}>Удалить</button>
+            <div className='btnsContainer'>
+            <button className='editBtn' onClick={() => handleEditDay(index)}><FaPencilAlt /></button>
+            <button className='deleteBtn' onClick={() => handleDeleteDay(index)}><FaTimes /></button>
+            </div>
           </li>
         ))}
       </ul>
